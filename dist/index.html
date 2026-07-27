@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aura Canvas — Infinite Visual Workspace</title>
+  <meta name="description" content="Aura Canvas is an infinite visual workspace designed to help users think, organize, and create through connected ideas.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- Remixicon for sleek modern icons -->
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+  
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body class="dark-theme">
+  <div id="app" class="app-container">
+    
+    <!-- Top Navigation Header -->
+    <header class="top-header">
+      <div class="header-left">
+        <div class="brand-logo">
+          <div class="logo-icon"><i class="ri-pulse-line"></i></div>
+          <span class="brand-name">Aura<span class="gradient-text">Canvas</span></span>
+        </div>
+        <div class="workspace-title-wrapper">
+          <input type="text" id="workspace-title" class="workspace-title-input" value="Brainstorm & Product Architecture" title="Rename Workspace">
+          <span class="saved-badge"><i class="ri-cloud-line"></i> Saved</span>
+        </div>
+      </div>
+
+      <!-- View Switcher -->
+      <div class="view-switcher" role="tablist">
+        <button class="view-btn active" data-view="canvas" id="btn-view-canvas" title="Infinite Canvas (V)">
+          <i class="ri-artboard-line"></i> Canvas
+        </button>
+        <button class="view-btn" data-view="kanban" id="btn-view-kanban" title="Kanban Board View (K)">
+          <i class="ri-layout-column-line"></i> Kanban
+        </button>
+        <button class="view-btn" data-view="list" id="btn-view-list" title="Outline List View (L)">
+          <i class="ri-list-check-2"></i> Outline
+        </button>
+      </div>
+
+      <!-- Top Right Actions -->
+      <div class="header-right">
+        <div class="search-box">
+          <i class="ri-search-line search-icon"></i>
+          <input type="text" id="global-search" placeholder="Search nodes or tags... (Ctrl+K)">
+          <kbd class="shortcut-kbd">⌘K</kbd>
+        </div>
+
+        <button class="primary-btn" id="btn-agent-panel" style="background: linear-gradient(135deg, #a855f7, #ec4899); shadow: var(--shadow-glow);" title="AI Brainstorming Assistant">
+          <i class="ri-sparkles-line"></i> <span>AI Agent</span>
+        </button>
+
+        <button class="icon-btn" id="btn-templates" title="Load Template">
+          <i class="ri-magic-line"></i> <span>Templates</span>
+        </button>
+        
+        <button class="icon-btn" id="btn-settings" title="AI & App Settings">
+          <i class="ri-settings-4-line"></i>
+        </button>
+
+        <div class="dropdown-wrapper">
+          <button class="primary-btn" id="btn-export-menu" title="Export Options">
+            <i class="ri-download-2-line"></i> Export <i class="ri-arrow-down-s-line"></i>
+          </button>
+          <div class="dropdown-menu" id="export-dropdown">
+            <button id="btn-export-json"><i class="ri-file-code-line"></i> Workspace JSON</button>
+            <button id="btn-export-png"><i class="ri-image-line"></i> Canvas PNG Image</button>
+            <hr class="menu-divider">
+            <button id="btn-import-json"><i class="ri-upload-2-line"></i> Import JSON Workspace</button>
+            <input type="file" id="input-import-file" accept=".json" style="display:none;">
+          </div>
+        </div>
+
+        <button class="icon-btn" id="btn-clear-canvas" title="Clear Canvas">
+          <i class="ri-delete-bin-line"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Viewport Area -->
+    <main class="main-viewport">
+      
+      <!-- View 1: Infinite Canvas -->
+      <div id="view-canvas" class="view-container active-view">
+        
+        <!-- Canvas Toolbar (Floating Left) -->
+        <aside class="floating-toolbar">
+          <div class="tool-group">
+            <button class="tool-btn active" data-tool="select" id="tool-select" title="Select / Move (V)">
+              <i class="ri-cursor-line"></i>
+            </button>
+            <button class="tool-btn" data-tool="pan" id="tool-pan" title="Pan Canvas (Space+Drag)">
+              <i class="ri-hand-coin-line"></i>
+            </button>
+            <button class="tool-btn" data-tool="connect" id="tool-connect" title="Connect Nodes (C)">
+              <i class="ri-git-commit-line"></i>
+            </button>
+          </div>
+          <div class="tool-divider"></div>
+          <div class="tool-group">
+            <button class="tool-btn" id="add-node-note" title="Add Note / Text">
+              <i class="ri-sticky-note-line"></i>
+            </button>
+            <button class="tool-btn" id="add-node-task" title="Add Checklist / Tasks">
+              <i class="ri-checkbox-line"></i>
+            </button>
+            <button class="tool-btn" id="add-node-image" title="Add Image Card">
+              <i class="ri-image-add-line"></i>
+            </button>
+            <button class="tool-btn" id="add-node-link" title="Add Link Bookmark">
+              <i class="ri-link"></i>
+            </button>
+            <button class="tool-btn" id="add-node-code" title="Add Code Snippet">
+              <i class="ri-code-s-slash-line"></i>
+            </button>
+            <button class="tool-btn" id="add-node-frame" title="Add Frame Group">
+              <i class="ri-crop-2-line"></i>
+            </button>
+          </div>
+          <div class="tool-divider"></div>
+          <div class="tool-group">
+            <button class="tool-btn" id="btn-undo" title="Undo (Ctrl+Z)"><i class="ri-arrow-go-back-line"></i></button>
+            <button class="tool-btn" id="btn-redo" title="Redo (Ctrl+Y)"><i class="ri-arrow-go-forward-line"></i></button>
+          </div>
+        </aside>
+
+        <!-- Canvas Workspace Viewport -->
+        <div id="canvas-viewport" class="canvas-viewport">
+          <div id="canvas-world" class="canvas-world">
+            <!-- Grid Background Overlay -->
+            <div id="canvas-grid" class="canvas-grid"></div>
+
+            <!-- SVG Container for Connections -->
+            <svg id="canvas-svg" class="canvas-svg">
+              <defs>
+                <marker id="arrow-default" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--color-primary-glow)" />
+                </marker>
+                <marker id="arrow-active" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill="#00f2fe" />
+                </marker>
+                <filter id="glow-effect" x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur stdDeviation="3" result="blur" />
+                  <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                </filter>
+              </defs>
+              <g id="connections-group"></g>
+              <path id="temp-connection-line" class="temp-connection-line" d="" style="display:none;"></path>
+            </svg>
+
+            <!-- Frames Layer -->
+            <div id="frames-layer" class="frames-layer"></div>
+
+            <!-- Nodes Layer -->
+            <div id="nodes-layer" class="nodes-layer"></div>
+
+            <!-- Selection Box -->
+            <div id="selection-box" class="selection-box" style="display:none;"></div>
+          </div>
+        </div>
+
+        <!-- Floating Minimap & Zoom Controls (Bottom Right) -->
+        <aside class="minimap-container">
+          <div class="minimap-header">
+            <span>NAVIGATOR</span>
+            <span id="zoom-percentage">100%</span>
+          </div>
+          <div class="minimap-canvas-wrapper" id="minimap-wrapper">
+            <canvas id="minimap-canvas" width="180" height="110"></canvas>
+            <div id="minimap-viewfinder" class="minimap-viewfinder"></div>
+          </div>
+          <div class="zoom-controls">
+            <button class="zoom-btn" id="btn-zoom-out" title="Zoom Out (-)"><i class="ri-subtract-line"></i></button>
+            <input type="range" id="zoom-slider" min="0.2" max="2.5" step="0.05" value="1.0">
+            <button class="zoom-btn" id="btn-zoom-in" title="Zoom In (+)"><i class="ri-add-line"></i></button>
+            <button class="zoom-btn" id="btn-zoom-fit" title="Fit to Screen"><i class="ri-aspect-ratio-line"></i></button>
+          </div>
+        </aside>
+
+        <!-- Canvas Quick Help Panel (Bottom Left) -->
+        <aside class="quick-help">
+          <div class="help-item"><kbd>Space</kbd> + Drag to Pan</div>
+          <div class="help-item"><kbd>Scroll</kbd> Zoom</div>
+          <div class="help-item"><kbd>Shift</kbd> + Drag Select</div>
+          <div class="help-item"><kbd>Alt</kbd> + Drag Handle Connect</div>
+        </aside>
+      </div>
+
+      <!-- View 2: Kanban Board -->
+      <div id="view-kanban" class="view-container">
+        <div class="kanban-wrapper">
+          <div class="kanban-header">
+            <h2>Kanban Workflow View</h2>
+            <div class="kanban-actions">
+              <button class="secondary-btn" id="btn-add-kanban-col"><i class="ri-add-line"></i> Add Column</button>
+            </div>
+          </div>
+          <div id="kanban-columns-container" class="kanban-columns-container">
+            <!-- Rendered by views.js -->
+          </div>
+        </div>
+      </div>
+
+      <!-- View 3: Outline List -->
+      <div id="view-list" class="view-container">
+        <div class="list-wrapper">
+          <div class="list-header">
+            <h2>Outline & Knowledge Graph</h2>
+            <span class="list-stats" id="list-stats-counter">0 Nodes, 0 Connections</span>
+          </div>
+          <div id="list-content-container" class="list-content-container">
+            <!-- Rendered by views.js -->
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- Brainstorming Agent Panel (Floating Right Sidebar) -->
+    <aside id="agent-panel" class="agent-panel" style="display:none;">
+      <div class="agent-panel-header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div class="agent-avatar"><i class="ri-sparkles-line"></i></div>
+          <div>
+            <h4 style="font-family: var(--font-heading); font-size: 1rem; color: #fff;">Aura Brainstorm Agent</h4>
+            <span style="font-size: 0.72rem; color: var(--color-accent);">In-Browser Intelligent Assistant</span>
+          </div>
+        </div>
+        <button class="icon-btn" id="btn-close-agent" style="width: 28px; height: 28px;"><i class="ri-close-line"></i></button>
+      </div>
+
+      <div class="agent-panel-body">
+        <div class="agent-section">
+          <label class="agent-section-label">Generate Topic Mind Map</label>
+          <div style="display: flex; gap: 6px;">
+            <input type="text" id="agent-topic-input" placeholder="e.g. AI Product Architecture, Mobile App..." style="flex: 1;">
+            <button class="primary-btn" id="btn-agent-generate-map" style="padding: 0 12px;"><i class="ri-send-plane-line"></i></button>
+          </div>
+          <div class="preset-chips">
+            <button class="preset-chip" data-topic="SaaS Product Launch">🚀 SaaS Launch</button>
+            <button class="preset-chip" data-topic="UX Redesign Roadmap">🎨 UX Redesign</button>
+            <button class="preset-chip" data-topic="AI Agent Architecture">🤖 AI System</button>
+            <button class="preset-chip" data-topic="Growth Marketing Strategy">📈 Marketing</button>
+          </div>
+        </div>
+
+        <hr class="menu-divider" style="margin: 12px 0;">
+
+        <div class="agent-section">
+          <label class="agent-section-label">Agent Actions</label>
+          <div class="agent-actions-grid">
+            <button class="agent-action-card" id="btn-agent-expand">
+              <i class="ri-node-tree"></i>
+              <div>
+                <strong>Expand Selected Node</strong>
+                <span>Generate 4 sub-ideas connected to selected card</span>
+              </div>
+            </button>
+
+            <button class="agent-action-card" id="btn-agent-to-task">
+              <i class="ri-list-check"></i>
+              <div>
+                <strong>Convert to Checklist</strong>
+                <span>Transform selected note into actionable tasks</span>
+              </div>
+            </button>
+
+            <button class="agent-action-card" id="btn-agent-autoconnect">
+              <i class="ri-git-merge-line"></i>
+              <div>
+                <strong>Auto-Connect Nodes</strong>
+                <span>Find and link related unconnected nodes</span>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Context Menu Modal -->
+    <div id="context-menu" class="context-menu" style="display:none;">
+      <button data-action="duplicate"><i class="ri-file-copy-line"></i> Duplicate Node</button>
+      <button data-action="connect"><i class="ri-git-commit-line"></i> Connect From Here</button>
+      <button data-action="color"><i class="ri-palette-line"></i> Change Color...</button>
+      <button data-action="status"><i class="ri-flag-line"></i> Change Status...</button>
+      <button data-action="frame"><i class="ri-crop-2-line"></i> Wrap in Frame</button>
+      <hr>
+      <button data-action="delete" class="danger"><i class="ri-delete-bin-line"></i> Delete Node</button>
+    </div>
+
+    <!-- Templates Modal -->
+    <div id="templates-modal" class="modal-overlay" style="display:none;">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3><i class="ri-magic-line"></i> Choose a Starter Template</h3>
+          <button class="close-btn" id="btn-close-templates"><i class="ri-close-line"></i></button>
+        </div>
+        <div class="modal-body templates-grid">
+          <div class="template-card" data-template="product-roadmap">
+            <div class="template-icon gradient-1"><i class="ri-rocket-line"></i></div>
+            <h4>Startup & Product Launch</h4>
+            <p>Interconnected roadmap with user research, tech stack, marketing tasks, and timeline frames.</p>
+          </div>
+          <div class="template-card" data-template="system-architecture">
+            <div class="template-icon gradient-2"><i class="ri-cpu-line"></i></div>
+            <h4>System Architecture Graph</h4>
+            <p>Visual map of frontend micro-services, API backend gateways, database nodes, and data flow lines.</p>
+          </div>
+          <div class="template-card" data-template="creative-brainstorm">
+            <div class="template-icon gradient-3"><i class="ri-lightbulb-line"></i></div>
+            <h4>Creative UX Brainstorm</h4>
+            <p>Sticky notes, moodboard images, color cards, and idea trees grouped in visual frames.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI Settings Modal -->
+    <div id="settings-modal" class="modal-overlay" style="display:none;">
+      <div class="modal-card" style="width: 520px;">
+        <div class="modal-header">
+          <h3><i class="ri-settings-4-line"></i> AI & Assistant Settings</h3>
+          <button class="close-btn" id="btn-close-settings"><i class="ri-close-line"></i></button>
+        </div>
+        <div class="modal-body" style="display: flex; flex-direction: column; gap: 16px;">
+          <div>
+            <label style="display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px;">OpenAI / Compatible API Key</label>
+            <input type="password" id="input-api-key" style="width: 100%;" placeholder="sk-...">
+            <span style="font-size: 0.75rem; color: var(--text-subtle); display: block; margin-top: 4px;">Key is saved locally in your browser storage only.</span>
+          </div>
+          <div>
+            <label style="display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px;">API Endpoint Base URL</label>
+            <input type="text" id="input-api-endpoint" style="width: 100%;" value="https://api.openai.com/v1" placeholder="https://api.openai.com/v1">
+          </div>
+          <div>
+            <label style="display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px;">AI Model</label>
+            <select id="select-ai-model" style="width: 100%; padding: 8px; border-radius: 6px; background: rgba(15,20,32,0.8); color: #fff; border: 1px solid var(--border-glass);">
+              <option value="gpt-4o-mini">gpt-4o-mini (Fast & Smart)</option>
+              <option value="gpt-4o">gpt-4o (High Intelligence)</option>
+              <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
+            </select>
+          </div>
+          <button class="primary-btn" id="btn-save-settings" style="justify-content: center; margin-top: 10px;">
+            <i class="ri-save-line"></i> Save Settings
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Command Palette Modal -->
+    <div id="command-palette-modal" class="modal-overlay" style="display:none;">
+      <div class="command-palette-card">
+        <div class="command-input-wrapper">
+          <i class="ri-terminal-box-line"></i>
+          <input type="text" id="command-palette-input" placeholder="Type a command or search nodes (e.g. 'Add Note', 'Kanban', '#urgent')...">
+        </div>
+        <div class="command-results" id="command-results">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Notifications Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+  </div>
+
+  <script type="module" src="./src/app.js"></script>
+</body>
+</html>
